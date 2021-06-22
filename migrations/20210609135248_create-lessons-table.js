@@ -12,7 +12,7 @@ exports.up = function (knex) {
             tbl.timestamps(true, true);
 
             // Foreign key to 'lessons' table
-            tbl.integer("lessons_id")
+            tbl.integer("lesson_id")
                 .unsigned()
                 .notNullable()
                 .references("id")

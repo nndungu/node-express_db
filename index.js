@@ -23,8 +23,8 @@ server.post("/api/lessons", (req, res) => {
 
 server.get("/api/lessons", (req, res) => {
     Lessons.find(req.body)
-        .then((lesson) => {
-            res.status(200).json(lesson);
+        .then((lessons) => {
+            res.status(200).json(lessons);
         })
         .catch((error) => {
             res.status(500).json({ message: "Unable to retrieve lessons" });
@@ -72,13 +72,78 @@ server.patch("/api/lessons/:id", (req, res) => {
     Lessons.update(id, changes)
         .then((lesson) => {
             if (lesson) {
-                res.status(lesson);
+                res.status(200).json(lesson);
             } else {
                 res.status(404).json({ message: "Record not found" });
             }
         })
         .catch((error) => {
             res.status(500).json({ message: "Error updating" });
+        });
+});
+
+server.post("/api/lessons/:id/messages", (req, res) => {
+    const { id } = req.params;
+    const msg = req.body;
+
+    if (!msg.lesson_id) {
+        msg["lesson_id"] = parseInt(id, 10);
+    }
+
+    Lessons.findById(id)
+        .then((lesson) => {
+            if (!lesson) {
+                res.status(404).json({ message: "Invalid id" });
+            }
+            // check for all required fileds
+            if (!msg.sender || !msg.text) {
+                res.status(400).json({
+                    message: "must provide both Sender and Text",
+                });
+            }
+
+            Lessons.addMessage(msg, id)
+                .then((message) => {
+                    if (message) {
+                        res.status(200).json(message);
+                    }
+                })
+                .catch((error) => {
+                    res.status(500).json({ message: "Failed to add message" });
+                });
+        })
+        .catch((error) => {
+            res.status(500).json({ message: "Error finding lesson" });
+        });
+});
+
+server.get("/api/lessons/:id/messages", (req, res) => {
+    const { id } = req.params;
+
+    Lessons.findLessonMessages(id)
+        .then((lesson) => {
+            res.status(200).json(lesson);
+        })
+        .catch((error) => {
+            res.status(500).json({ message: "Error retrieving message" });
+        });
+});
+
+server.delete("/api/messages/:id", (req, res) => {
+    const { id } = req.params;
+
+    Lessons.removeMessage(id)
+        .then((count) => {
+            if (count > 0) {
+                res.status(200).json({
+                    message: `Message with id ${id} successfully deleted`,
+                });
+            } else {
+                res.status(404).json({ message: "No message with that id" });
+            }
+        })
+        .catch((error) => {
+            res.status(500).json({ message: "Unable to delete message" });
         });
 });
 
