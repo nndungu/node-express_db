@@ -17,9 +17,10 @@ module.exports = {
     find,
 };
 async function add(lesson) {
-    const [id] = await db("lessons").insert(lesson);
+    return await db("lessons").insert(lesson, ["id", "name"]);
+    // const [id] = await db("lessons").insert(lesson);
 
-    return findById(id);
+    // return findById(id);
 }
 
 function find() {
@@ -48,8 +49,10 @@ function findMessageById(id) {
 }
 
 async function addMessage(message, lesson_id) {
-    const [id] = await db("messages").where({ lesson_id }).insert(message);
-    return findMessageById(id);
+    return await db("messages").where({ lesson_id }).insert(message_id, ["id"]);
+
+    // const [id] = await db("messages").where({ lesson_id }).insert(message);
+    // return findMessageById(id);
 }
 
 function findLessonMessages(lesson_id) {
