@@ -13,6 +13,7 @@ module.exports = {
     addMessage,
     findLessonMessages,
     removeMessage,
+    find,
 };
 async function add(lesson) {
     const [id] = await db("lessons").insert(lesson);
