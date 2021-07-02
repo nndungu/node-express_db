@@ -37,4 +37,14 @@ router.get("/", (req, res) => {
         });
 });
 
+router.get("/:username", (req, res) => {
+    const { username } = req.params;
+    Lessons.findUserByUsername(username)
+        .then((user) => {
+            res.status(200).json(user);
+        })
+        .catch((error) => {
+            res.status(500).json(error);
+        });
+});
 module.exports = router;
