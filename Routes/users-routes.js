@@ -27,4 +27,14 @@ router.post("/register", (req, res) => {
         });
 });
 
+router.get("/", (req, res) => {
+    Lessons.findAllUsers()
+        .then((users) => {
+            res.status(200).json(users);
+        })
+        .catch((error) => {
+            res.status(500).json({ message: "Unable to retrieve users" });
+        });
+});
+
 module.exports = router;
