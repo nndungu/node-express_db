@@ -1,5 +1,7 @@
 const express = require("express");
 const Lessons = require("../models/dbHelpers");
+const bcrypt = require("bcryptjs");
+const { route } = require("./messages-routes");
 
 const router = express.Router();
 
@@ -14,6 +16,9 @@ router.post("/register", (req, res) => {
             .json({ message: "Username and Password required" });
     }
 
+    const hash = bcrypt.hashSync(credentials.password, 12);
+    credentials.password = hash;
+
     Lessons.addUser(credentials)
         .then((user) => {
             res.status(200).json(user);
@@ -24,6 +29,28 @@ router.post("/register", (req, res) => {
             } else {
                 res.status(500).json(error);
             }
+        });
+});
+
+router.post("/login", (req, res) => {
+    const { username, password } = req.body;
+
+    if (!(username && password)) {
+        return res
+            .status(400)
+            .json({ message: "Username and Password required" });
+    }
+
+    Lessons.findUserByUsername(username)
+        .then((user) => {
+            if (user && bcrypt.compareSync(password, user.password)) {
+                res.status(200).json({ message: `Welcome ${user.username}!` });
+            } else {
+                res.status(401).jso({ message: "Invalid credentials" });
+            }
+        })
+        .catch((error) => {
+            res.status(500).json(error);
         });
 });
 
