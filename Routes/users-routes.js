@@ -6,7 +6,6 @@ const { route } = require("./messages-routes");
 const router = express.Router();
 
 //for all endpoints begning with /api/users
-
 router.get("/", (req, res) => {
     Lessons.findAllUsers()
         .then((users) => {
